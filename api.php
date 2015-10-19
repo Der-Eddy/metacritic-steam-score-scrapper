@@ -1,6 +1,10 @@
 <?php
-    //I hate the Steam API
+    header('Cache-Control: no-cache, must-revalidate');
+    header('Content-type: application/json');
     
+    $appid = 218620; // => PayDay2
+    $metaLink = "http://www.metacritic.com/game/pc/payday-2";
+
     //This is for caching, since Steam will ban my server if they got too many requests from it
     function get_content($file,$url,$seconds = 5,$fn = '',$fn_args = '') {
         
@@ -18,11 +22,8 @@
         }
     }
 
-    $json_object = get_content("api.json", "http://api.steampowered.com/ISteamUserStats/GetGlobalStatsForGame/v0001/?appid=218620&count=23&name[0]=crimefest_challenge_chains_1&name[1]=crimefest_challenge_dallas_1&name[2]=crimefest_challenge_clover_1&name[3]=crimefest_challenge_houston_1&name[4]=crimefest_challenge_chains_2&name[5]=crimefest_challenge_dallas_2&name[6]=crimefest_challenge_clover_2&name[7]=crimefest_challenge_houston_2&name[8]=crimefest_challenge_chains_3&name[9]=crimefest_challenge_dallas_3&name[10]=crimefest_challenge_clover_3&name[11]=crimefest_challenge_houston_3&name[12]=crimefest_challenge_chains_4&name[13]=crimefest_challenge_clover_4&name[14]=crimefest_challenge_houston_4&name[15]=crimefest_challenge_chains_5&name[16]=crimefest_challenge_dallas_5&name[17]=crimefest_challenge_clover_5&name[18]=crimefest_challenge_houston_5&name[19]=crimefest_challenge_chains_6&name[20]=crimefest_challenge_dallas_6&name[21]=crimefest_challenge_clover_6&name[22]=crimefest_challenge_final");
-    $current_player = json_decode(get_content("currentPlayer.json", "http://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001/?appid=218620"), true);
-    $max_player = json_decode(file_get_contents("maxPlayer.json"), true);
-    if ($max_player["response"]["player_count"] < $current_player["response"]["player_count"]){
-        file_put_contents("maxPlayer.json", json_encode($current_player));
-    }
-    echo $json_object;
+    $json_data = json_decode(get_content("currentPlayer.json", "http://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001/?appid=$appid"), true);
+    $json_data["response"]["appid"] = $appid;
+    $json_data["response"]["metacritic_link"] = $metaLink;
+    echo json_encode($json_data);
 ?>
