@@ -13,17 +13,26 @@ By visiting api.php you will get a json object which should look likes this:
 ```json
 {
     "response": 
-    {
-        "player_count": 27392,
-        "result": 1,
-        "appid": 218620,
-        "metacritic_link": "http://www.metacritic.com/game/pc/payday-2",
-        "metacritic_score": 79,
-        "steam_link": "http://store.steampowered.com/app/218620/",
-        "steam_reviews_all": 152450
+{
+    "player_count": 15485,
+    "result": 1,
+    "appid": 218620,
+"metacritic": 
+        {
+            "link": "http://www.metacritic.com/game/pc/payday-2",
+            "score": 79,
+            "user_score": "4.7"
+        },
+"steam": 
+        {
+            "link": "http://store.steampowered.com/app/218620/",
+            "reviews_all": 153427
+        }
     }
 }
 ```
+
+JSONP output for Cross-Site-Domain Calls is also possible.
 
 License
 -------------

@@ -1,6 +1,7 @@
 <?php
     header('Cache-Control: no-cache, must-revalidate');
-    header('Content-type: application/json');
+    header('content-type: application/json; charset=utf-8');
+    header("access-control-allow-origin: *");
     
     $appid = 218620; // => PayDay2
 
@@ -21,16 +22,49 @@
         }
     }
 
+    //http://www.geekality.net/2010/06/27/php-how-to-easily-provide-json-and-jsonp/    
+    function is_valid_callback($subject)
+    {
+        $identifier_syntax
+          = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*+$/u';
+
+        $reserved_words = array('break', 'do', 'instanceof', 'typeof', 'case',
+          'else', 'new', 'var', 'catch', 'finally', 'return', 'void', 'continue',
+          'for', 'switch', 'while', 'debugger', 'function', 'this', 'with',
+          'default', 'if', 'throw', 'delete', 'in', 'try', 'class', 'enum',
+          'extends', 'super', 'const', 'export', 'import', 'implements', 'let',
+          'private', 'public', 'yield', 'interface', 'package', 'protected',
+          'static', 'null', 'true', 'false');
+
+        return preg_match($identifier_syntax, $subject)
+            && ! in_array(mb_strtolower($subject, 'UTF-8'), $reserved_words);
+    }
+
     $steamLink = "http://store.steampowered.com/app/$appid/";
 
     $json_data = json_decode(get_content("currentPlayer.json", "http://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001/?appid=$appid"), true);
     $metacritic_score = json_decode(get_content("storefront.json", "http://store.steampowered.com/api/appdetails/?appids=$appid"), true);
 
+    $metacritic = get_content("metacritic_dump.html", $metacritic_score[$appid]["data"]["metacritic"]["url"], 180);
+    preg_match("/<div class=\"metascore_w user large game .*?\">(.*?)<\\/div>/", $metacritic, $metacritic_userscore);
 
     $json_data["response"]["appid"] = $appid;
-    $json_data["response"]["metacritic_link"] = $metacritic_score[$appid]["data"]["metacritic"]["url"];
-    $json_data["response"]["metacritic_score"] = $metacritic_score[$appid]["data"]["metacritic"]["score"];
-    $json_data["response"]["steam_link"] = $steamLink;
-    $json_data["response"]["steam_reviews_all"] = $metacritic_score[$appid]["data"]["recommendations"]["total"];
-    echo json_encode($json_data);
+    $json_data["response"]["metacritic"]["link"] = $metacritic_score[$appid]["data"]["metacritic"]["url"];
+    $json_data["response"]["metacritic"]["score"] = $metacritic_score[$appid]["data"]["metacritic"]["score"];
+    $json_data["response"]["metacritic"]["user_score"] = $metacritic_userscore[1];
+    $json_data["response"]["steam"]["link"] = $steamLink;
+    $json_data["response"]["steam"]["reviews_all"] = $metacritic_score[$appid]["data"]["recommendations"]["total"];
+
+    $json = json_encode($json_data);
+
+    # JSON if no callback
+    if( ! isset($_GET['callback']))
+        exit($json);
+
+    # JSONP if valid callback
+    if(is_valid_callback($_GET['callback']))
+        exit("{$_GET['callback']}($json)");
+
+    # Otherwise, bad request
+    header('status: 400 Bad Request', true, 400);
 ?>
