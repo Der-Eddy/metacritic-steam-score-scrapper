@@ -25,9 +25,12 @@
 
     $json_data = json_decode(get_content("currentPlayer.json", "http://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001/?appid=$appid"), true);
     $metacritic_score = json_decode(get_content("storefront.json", "http://store.steampowered.com/api/appdetails/?appids=$appid"), true);
+
+
     $json_data["response"]["appid"] = $appid;
     $json_data["response"]["metacritic_link"] = $metacritic_score[$appid]["data"]["metacritic"]["url"];
     $json_data["response"]["metacritic_score"] = $metacritic_score[$appid]["data"]["metacritic"]["score"];
     $json_data["response"]["steam_link"] = $steamLink;
+    $json_data["response"]["steam_reviews_all"] = $metacritic_score[$appid]["data"]["recommendations"]["total"];
     echo json_encode($json_data);
 ?>
