@@ -6,6 +6,12 @@ This repository was made for this project: [Road-From-Greedfest
 It's a fork of the API from my [crimefest-statistics
 ](https://github.com/Der-Eddy/crimefest-statistics) site
 
+
+Usage
+-------------
+##### Just retrieve this data: `http://crimefest.eddydev.de/api/api.php`  
+JSONP & CORS is available
+
 Sample Output
 -------------
 
@@ -33,6 +39,13 @@ By visiting api.php you will get a json object which should look likes this:
 ```
 
 JSONP output for Cross-Site-Domain Calls is also possible.
+
+
+ToDo
+-------------
+- [x] Metacritic Userscore
+- [ ] Steam Review Rating
+
 
 License
 -------------
