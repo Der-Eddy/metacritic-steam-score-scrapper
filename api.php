@@ -6,7 +6,7 @@
     $appid = 218620; // => PayDay2
 
     //This is for caching, since Steam will ban my server if they got too many requests from it
-    function get_content($file,$url,$seconds = 5,$fn = '',$fn_args = '') {
+    function get_content($file,$url,$seconds = 5,$fn = '',$fn_args = '',$agecheck=false) {
         
         $current_time = time(); $expire_time = $seconds; $file_time = filemtime($file);
         
@@ -15,7 +15,21 @@
             return file_get_contents($file);
         }
         else {
-            $content = file_get_contents($url);
+            if ($agecheck == false){
+                $content = file_get_contents($url);
+            } else {
+                $options = array(
+                    'http' => array(
+                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method'  => 'POST',
+                        'referer'   => "Referer: http://store.steampowered.com/agecheck/app/$appid/",
+                        'content' => http_build_query("snr=1_agecheck_agecheck__age-gate&ageDay=1&ageMonth=January&ageYear=1955"),
+                    ),
+                );
+                $context  = stream_context_create($options);
+                $content = file_get_contents($url, false, $context);
+            }
+            
             if (strlen($content) < 1) {
                 return file_get_contents($file);
             }
@@ -52,7 +66,7 @@
     $metacritic = get_content("metacritic_dump.html", $metacritic_score[$appid]["data"]["metacritic"]["url"], 120);
     preg_match("/<div class=\"metascore_w user large game .*?\">(.*?)<\\/div>/", $metacritic, $metacritic_userscore);
 
-    $steamreview = get_content("steamstore_dump.html", $steamLink, 30);
+    $steamreview = get_content("steamstore_dump.html", $steamLink, 30, "", "", true);
     preg_match("/<span class=\"user_reviews_count\">\\((.*?)\\)<\\/span>/", $steamreview, $steamreview_positive);
     $steamreview_positive = (int)str_replace(',', '', $steamreview_positive[1]);
     if ($steamreview_positive == 0){
@@ -62,7 +76,7 @@
     }
 
     $min_player = json_decode(file_get_contents("minPlayer.json"), true);
-    if ($min_player["response"]["player_count"] > $json_data["response"]["player_count"]){
+    if ($min_player["response"]["player_count"] > $json_data["response"]["player_count"] && $json_data["response"]["player_count"] > 0){
         file_put_contents("minPlayer.json", json_encode($json_data));
     }
     $json_data["response"]["player_count_minimum"] = $min_player["response"]["player_count"];
