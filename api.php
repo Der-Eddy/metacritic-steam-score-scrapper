@@ -52,6 +52,10 @@
     $metacritic = get_content("metacritic_dump.html", $metacritic_score[$appid]["data"]["metacritic"]["url"], 120);
     preg_match("/<div class=\"metascore_w user large game .*?\">(.*?)<\\/div>/", $metacritic, $metacritic_userscore);
 
+    $steamreview = get_content("steamstore_dump.html", $steamLink, 30);
+    preg_match("/<span class=\"user_reviews_count\">\\((.*?)\\)<\\/span>/", $steamreview, $steamreview_positive);
+    $steamreview_positive = (int)str_replace(',', '', $steamreview_positive[1]);
+
     $min_player = json_decode(file_get_contents("minPlayer.json"), true);
     if ($min_player["response"]["player_count"] > $json_data["response"]["player_count"]){
         file_put_contents("minPlayer.json", json_encode($json_data));
@@ -64,6 +68,8 @@
     $json_data["response"]["metacritic"]["user_score"] = (float)$metacritic_userscore[1];
     $json_data["response"]["steam"]["link"] = $steamLink;
     $json_data["response"]["steam"]["reviews_all"] = $metacritic_score[$appid]["data"]["recommendations"]["total"];
+    $json_data["response"]["steam"]["reviews_positive"] = $steamreview_positive;
+    $json_data["response"]["steam"]["reviews_negative"] = $metacritic_score[$appid]["data"]["recommendations"]["total"] - $steamreview_positive;
 
     $json = json_encode($json_data);
 

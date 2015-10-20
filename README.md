@@ -21,26 +21,28 @@ By visiting api.php you will get a json object which should look likes this:
 
     "response": 
 
-{
+    {
 
-    "player_count": 24459,
-    "player_count_minimum": 9200,
-    "appid": 218620,
-"metacritic": 
+        "player_count": 24459,
+        "player_count_minimum": 9200,
+        "appid": 218620,
+        "metacritic": 
 
-{
+            {
 
-    "link": "http://www.metacritic.com/game/pc/payday-2",
-    "score": 79,
-    "user_score": 0
+                "link": "http://www.metacritic.com/game/pc/payday-2",
+                "score": 79,
+                "user_score": 4.6
 
-},
-"steam": 
+            },
+        "steam": 
 
-        {
-            "link": "http://store.steampowered.com/app/218620/",
-            "reviews_all": 154385
-        }
+            {
+                "link": "http://store.steampowered.com/app/218620/",
+                "reviews_all": 154385,
+                "reviews_positive": 123374,
+                "reviews_negative": 31011
+            }
     }
 
 }
@@ -52,7 +54,8 @@ JSONP output for Cross-Site-Domain Calls is also possible.
 ToDo
 -------------
 - [x] Metacritic Userscore
-- [ ] Steam Review Rating
+- [x] Steam Review Rating
+- [ ] Fix that the PHP script sometimes doesn't load anything from Metacritic and/or SteamStore
 
 
 License
