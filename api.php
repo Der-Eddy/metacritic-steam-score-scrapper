@@ -46,10 +46,17 @@
     $steamLink = "http://store.steampowered.com/app/$appid/";
 
     $json_data = json_decode(get_content("currentPlayer.json", "http://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001/?appid=$appid"), true);
+    unset($json_data["response"]["result"]);
     $metacritic_score = json_decode(get_content("storefront.json", "http://store.steampowered.com/api/appdetails/?appids=$appid"), true);
 
     $metacritic = get_content("metacritic_dump.html", $metacritic_score[$appid]["data"]["metacritic"]["url"], 120);
     preg_match("/<div class=\"metascore_w user large game .*?\">(.*?)<\\/div>/", $metacritic, $metacritic_userscore);
+
+    $min_player = json_decode(file_get_contents("minPlayer.json"), true);
+    if ($min_player["response"]["player_count"] > $json_data["response"]["player_count"]){
+        file_put_contents("minPlayer.json", json_encode($json_data));
+    }
+    $json_data["response"]["player_count_minimum"] = $min_player["response"]["player_count"];
 
     $json_data["response"]["appid"] = $appid;
     $json_data["response"]["metacritic"]["link"] = $metacritic_score[$appid]["data"]["metacritic"]["url"];

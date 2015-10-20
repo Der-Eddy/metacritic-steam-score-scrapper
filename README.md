@@ -18,23 +18,31 @@ Sample Output
 By visiting api.php you will get a json object which should look likes this:
 ```json
 {
+
     "response": 
+
 {
-    "player_count": 15485,
-    "result": 1,
+
+    "player_count": 24459,
+    "player_count_minimum": 9200,
     "appid": 218620,
 "metacritic": 
-        {
-            "link": "http://www.metacritic.com/game/pc/payday-2",
-            "score": 79,
-            "user_score": "4.7"
-        },
+
+{
+
+    "link": "http://www.metacritic.com/game/pc/payday-2",
+    "score": 79,
+    "user_score": 0
+
+},
 "steam": 
+
         {
             "link": "http://store.steampowered.com/app/218620/",
-            "reviews_all": 153427
+            "reviews_all": 154385
         }
     }
+
 }
 ```
 
