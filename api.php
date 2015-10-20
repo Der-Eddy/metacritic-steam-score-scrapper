@@ -16,7 +16,7 @@
         }
         else {
             $content = file_get_contents($url);
-            if (strlen($content) > 1) {
+            if (strlen($content) < 1) {
                 return file_get_contents($file);
             }
             if($fn) { $content = $fn($content,$fn_args); }
@@ -55,6 +55,11 @@
     $steamreview = get_content("steamstore_dump.html", $steamLink, 30);
     preg_match("/<span class=\"user_reviews_count\">\\((.*?)\\)<\\/span>/", $steamreview, $steamreview_positive);
     $steamreview_positive = (int)str_replace(',', '', $steamreview_positive[1]);
+    if ($steamreview_positive == 0){
+        $steamreview_negative = 0;
+    } else {
+        $steamreview_negative = $metacritic_score[$appid]["data"]["recommendations"]["total"] - $steamreview_positive;
+    }
 
     $min_player = json_decode(file_get_contents("minPlayer.json"), true);
     if ($min_player["response"]["player_count"] > $json_data["response"]["player_count"]){
@@ -69,7 +74,7 @@
     $json_data["response"]["steam"]["link"] = $steamLink;
     $json_data["response"]["steam"]["reviews_all"] = $metacritic_score[$appid]["data"]["recommendations"]["total"];
     $json_data["response"]["steam"]["reviews_positive"] = $steamreview_positive;
-    $json_data["response"]["steam"]["reviews_negative"] = $metacritic_score[$appid]["data"]["recommendations"]["total"] - $steamreview_positive;
+    $json_data["response"]["steam"]["reviews_negative"] = $steamreview_negative;
 
     $json = json_encode($json_data);
 
