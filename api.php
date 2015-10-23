@@ -18,12 +18,19 @@
             if ($agecheck == false){
                 $content = file_get_contents($url);
             } else {
+                $data = array(  'snr' => '1_agecheck_agecheck__age-gate',
+                                'ageDay' => 1,
+                                'ageMonth' => 'January',
+                                'ageYear' => '1955'
+                );
+
                 $options = array(
                     'http' => array(
-                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'header'  =>    "Content-type: application/x-www-form-urlencoded\r\n" .
+                                        "Cookie: http%3A%2F%2Fstore.steampowered.com%2Fapp%2F218620%2F; birthtime=-473356799; lastagecheckage=1-January-1955;",
                         'method'  => 'POST',
                         'referer'   => "Referer: http://store.steampowered.com/agecheck/app/$appid/",
-                        'content' => http_build_query("snr=1_agecheck_agecheck__age-gate&ageDay=1&ageMonth=January&ageYear=1955"),
+                        'content' => http_build_query($data),
                     ),
                 );
                 $context  = stream_context_create($options);
@@ -66,7 +73,7 @@
     $metacritic = get_content("metacritic_dump.html", $metacritic_score[$appid]["data"]["metacritic"]["url"], 120);
     preg_match("/<div class=\"metascore_w user large game .*?\">(.*?)<\\/div>/", $metacritic, $metacritic_userscore);
 
-    $steamreview = get_content("steamstore_dump.html", $steamLink, 30, "", "", true);
+    $steamreview = get_content("steamstore_dump.html", $steamLink, 60, "", "", true); // => Agecheck
     preg_match("/<span class=\"user_reviews_count\">\\((.*?)\\)<\\/span>/", $steamreview, $steamreview_positive);
     $steamreview_positive = (int)str_replace(',', '', $steamreview_positive[1]);
     if ($steamreview_positive == 0){

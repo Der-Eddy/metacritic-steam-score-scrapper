@@ -55,7 +55,8 @@ ToDo
 -------------
 - [x] Metacritic Userscore
 - [x] Steam Review Rating
-- [ ] Fix that the PHP script sometimes doesn't load anything from Metacritic and/or SteamStore
+- [x] Fix that the PHP script sometimes doesn't load anything from Metacritic and/or SteamStore
+- [x] Adding Agecheck cookie for SteamStore
 
 
 License
