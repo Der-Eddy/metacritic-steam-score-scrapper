@@ -9,8 +9,10 @@ It's a fork of the API from my [crimefest-statistics
 
 Usage
 -------------
-##### Just retrieve this data: `http://crimefest.eddydev.de/api/api.php`  
-JSONP & CORS is available
+##### For JSON Output: `http://crimefest.eddydev.de/api/api.php`  
+##### For XML Output: `http://crimefest.eddydev.de/api/api.php?type=xml`  
+##### For JSONP Output: `http://crimefest.eddydev.de/api/api.php?callback=response`  
+CORS Support is available
 
 Sample Output
 -------------

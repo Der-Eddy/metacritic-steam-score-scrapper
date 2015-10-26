@@ -64,6 +64,21 @@
             && ! in_array(mb_strtolower($subject, 'UTF-8'), $reserved_words);
     }
 
+    // function defination to convert array to xml / http://stackoverflow.com/a/5965940
+    function array_to_xml( $data, &$xml_data ) {
+        foreach( $data as $key => $value ) {
+            if( is_array($value) ) {
+                if( is_numeric($key) ){
+                    $key = 'item'.$key; //dealing with <0/>..<n/> issues
+                }
+                $subnode = $xml_data->addChild($key);
+                array_to_xml($value, $subnode);
+            } else {
+                $xml_data->addChild("$key",htmlspecialchars("$value"));
+            }
+         }
+    }
+
     $steamLink = "http://store.steampowered.com/app/$appid/";
 
     $json_data = json_decode(get_content("currentPlayer.json", "http://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v0001/?appid=$appid"), true);
@@ -124,6 +139,14 @@
     $json_data["response"]["steam"]["reviews_rating"] = $steamreview_rating;
 
     $json = json_encode($json_data);
+
+    # XML if ?type=xml
+    if($_GET['type'] == 'xml'){
+        header("Content-type: text/xml; charset=utf-8");
+        $xml_data = new SimpleXMLElement('<?xml version="1.0"?><data></data>');
+        array_to_xml($json_data,$xml_data);
+        exit($xml_data->asXML());
+    }
 
     # JSON if no callback
     if( ! isset($_GET['callback']))
