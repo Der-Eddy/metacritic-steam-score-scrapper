@@ -75,11 +75,35 @@
 
     $steamreview = get_content("steamstore_dump.html", $steamLink, 60, "", "", true); // => Agecheck
     preg_match("/<span class=\"user_reviews_count\">\\((.*?)\\)<\\/span>/", $steamreview, $steamreview_positive);
+    preg_match("/<span class=\"nonresponsive_hidden responsive_reviewdesc\">\\W+(\\d+)%/", $steamreview, $steamreview_percentage);
     $steamreview_positive = (int)str_replace(',', '', $steamreview_positive[1]);
+    $steamreview_percentage = (int)$steamreview_percentage[1];
     if ($steamreview_positive == 0){
         $steamreview_negative = 0;
     } else {
         $steamreview_negative = $metacritic_score[$appid]["data"]["recommendations"]["total"] - $steamreview_positive;
+    }
+
+    switch (true){
+        case ($steamreview_percentage > 94):
+        $steamreview_rating = "Overhwelmingly Positive";
+        break;
+        case ($steamreview_percentage > 79):
+        $steamreview_rating = "Very Positive";
+        break;
+        case ($steamreview_percentage > 69):
+        $steamreview_rating = "Mostly Positive";
+        break;
+        case ($steamreview_percentage > 39):
+        $steamreview_rating = "Mixed";
+        break;
+        case ($steamreview_percentage > 19):
+        $steamreview_rating = "Mostly Negative";
+        break;
+        default:
+        $steamreview_rating = "Overwhelmingly Negative";
+        break;
+
     }
 
     $min_player = json_decode(file_get_contents("minPlayer.json"), true);
@@ -96,6 +120,8 @@
     $json_data["response"]["steam"]["reviews_all"] = $metacritic_score[$appid]["data"]["recommendations"]["total"];
     $json_data["response"]["steam"]["reviews_positive"] = $steamreview_positive;
     $json_data["response"]["steam"]["reviews_negative"] = $steamreview_negative;
+    $json_data["response"]["steam"]["reviews_percentage"] = $steamreview_percentage;
+    $json_data["response"]["steam"]["reviews_rating"] = $steamreview_rating;
 
     $json = json_encode($json_data);
 
