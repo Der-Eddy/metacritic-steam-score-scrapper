@@ -88,6 +88,10 @@
     $metacritic = get_content("metacritic_dump.html", $metacritic_score[$appid]["data"]["metacritic"]["url"], 120);
     preg_match("/<div class=\"metascore_w user large game .*?\">(.*?)<\\/div>/", $metacritic, $metacritic_userscore);
 
+    $steamhub = get_content("metacritic_dump.html", "https://steamcommunity.com/games/$appid/", 120);
+    preg_match("/members\">(.*?)\\s/", $steamhub, $steamhub_users);
+    $steamhub_users = (int)str_replace(',', '', $steamhub_users[1]);
+
     $steamreview = get_content("steamstore_dump.html", $steamLink, 60, "", "", true); // => Agecheck
     preg_match("/<span class=\"user_reviews_count\">\\((.*?)\\)<\\/span>/", $steamreview, $steamreview_positive);
     preg_match("/<span class=\"nonresponsive_hidden responsive_reviewdesc\">\\W+(\\d+)%/", $steamreview, $steamreview_percentage);
@@ -137,6 +141,7 @@
     $json_data["response"]["steam"]["reviews_negative"] = $steamreview_negative;
     $json_data["response"]["steam"]["reviews_percentage"] = $steamreview_percentage;
     $json_data["response"]["steam"]["reviews_rating"] = $steamreview_rating;
+    $json_data["response"]["steam"]["hub_users_following"] = $steamhub_users;
 
     $json = json_encode($json_data);
 
