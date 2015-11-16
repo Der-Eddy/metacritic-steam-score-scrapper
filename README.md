@@ -45,7 +45,8 @@ By visiting api.php you will get a json object which should look likes this:
                 "reviews_positive": 123374,
                 "reviews_negative": 31011,
                 "reviews_percentage": ​77,
-                "reviews_rating": "Mostly Positive"
+                "reviews_rating": "Mostly Positive",
+                "hub_users_following": ​3361228                
             }
     }
 
