@@ -88,7 +88,7 @@
     $metacritic = get_content("metacritic_dump.html", $metacritic_score[$appid]["data"]["metacritic"]["url"], 120);
     preg_match("/<div class=\"metascore_w user large game .*?\">(.*?)<\\/div>/", $metacritic, $metacritic_userscore);
 
-    $steamhub = get_content("metacritic_dump.html", "https://steamcommunity.com/games/$appid/", 120);
+    $steamhub = get_content("steamhub_dump.html", "https://steamcommunity.com/games/$appid/", 120);
     preg_match("/members\">(.*?)\\s/", $steamhub, $steamhub_users);
     $steamhub_users = (int)str_replace(',', '', $steamhub_users[1]);
 
