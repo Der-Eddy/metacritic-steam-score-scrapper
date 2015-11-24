@@ -16,8 +16,14 @@
         }
         else {
             if ($agecheck == false){
-                $content = file_get_contents($url);
+                //$content = file_get_contents(urlencode($url));
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, urlencode($url));
+                curl_setopt($ch, CURLOPT_HEADER, 0);
+                $content = curl_exec($ch);
+                curl_close($ch);
             } else {
+                /*
                 $data = array(  'snr' => '1_agecheck_agecheck__age-gate',
                                 'ageDay' => 1,
                                 'ageMonth' => 'January',
@@ -34,7 +40,15 @@
                     ),
                 );
                 $context  = stream_context_create($options);
-                $content = file_get_contents($url, false, $context);
+                $content = file_get_contents(urlencode($url), false, $context);
+                */
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, urlencode($url));
+                curl_setopt($ch, CURLOPT_HEADER, 0);
+                curl_setopt($ch, CURLOPT_COOKIE, "http%3A%2F%2Fstore.steampowered.com%2Fapp%2F218620%2F; birthtime=-473356799; lastagecheckage=1-January-1955;");
+                $content = curl_exec($ch);
+                curl_close($ch);
             }
             
             if (strlen($content) < 1) {
@@ -145,22 +159,23 @@
 
     $json = json_encode($json_data);
 
-    # XML if ?type=xml
-    if($_GET['type'] == 'xml'){
-        header("Content-type: text/xml; charset=utf-8");
-        $xml_data = new SimpleXMLElement('<?xml version="1.0"?><data></data>');
-        array_to_xml($json_data,$xml_data);
-        exit($xml_data->asXML());
+    if (isset($_GET['type'])) {
+        # XML if ?type=xml
+        if($_GET['type'] == 'xml'){
+            header("Content-type: text/xml; charset=utf-8");
+            $xml_data = new SimpleXMLElement('<?xml version="1.0"?><data></data>');
+            array_to_xml($json_data,$xml_data);
+            exit($xml_data->asXML());
+        }
     }
-
     # JSON if no callback
-    if( ! isset($_GET['callback']))
-        exit($json);
+        if( ! isset($_GET['callback']))
+            exit($json);
 
-    # JSONP if valid callback
-    if(is_valid_callback($_GET['callback']))
-        exit("{$_GET['callback']}($json)");
+        # JSONP if valid callback
+        if(is_valid_callback($_GET['callback']))
+            exit("{$_GET['callback']}($json)");
 
-    # Otherwise, bad request
-    header('status: 400 Bad Request', true, 400);
+        # Otherwise, bad request
+        header('status: 400 Bad Request', true, 400);
 ?>
